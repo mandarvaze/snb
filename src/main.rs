@@ -5,7 +5,7 @@ use clap::{Args, Parser, Subcommand, ValueEnum};
 #[command(name = "snb", about = "A fast note-taking CLI", long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Debug, Subcommand)]
@@ -35,7 +35,7 @@ enum Commands {
         id: u32,
     },
     /// List all notes
-    List,
+    // List,
     /// Edit a note
     Edit {
         /// id of the note
@@ -72,15 +72,32 @@ fn main() {
     let args = Cli::parse();
 
     match args.command {
-        Commands::Add {
+        Some(Commands::Add {
             title,
             content,
             filename,
-        } => todo!(),
-        Commands::View { id } => todo!(),
-        Commands::Delete { id } => todo!(),
-        Commands::List => todo!(),
-        Commands::Edit { id } => todo!(),
-        Commands::Folder(_) => todo!(),
+        }) => {
+            println!("Adding Note with Content {}", content);
+            if let Some(filename) = filename {
+                println!("Saving to {}", filename);
+            }
+        }
+        Some(Commands::View { id }) => {
+            println!("Viewing Note {}", id);
+        }
+        Some(Commands::Delete { id }) => {
+            println!("Deleting Note {}", id);
+        }
+        // Commands::List => todo!(),
+        Some(Commands::Edit { id }) => {
+            println!("Editing Note {}", id);
+        }
+        Some(Commands::Folder(_)) => {
+            println!("Folder commands");
+        }
+        // Use List if no subcommand was provided
+        _ => {
+            println!("Listing Notes");
+        }
     }
 }
