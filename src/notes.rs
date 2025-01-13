@@ -1,8 +1,9 @@
+use crate::common;
+
 pub fn add_note(content: String, filename: Option<String>, title: Option<String>) {
+    let filename = common::utils::get_filename(filename);
     println!("Adding Note with Content {}", content);
-    if let Some(filename) = filename {
-        println!("Saving to {}", filename);
-    }
+    println!("Saving to {}", filename);
 }
 
 pub fn view_note(id: &u32) {
