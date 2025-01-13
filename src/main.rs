@@ -1,4 +1,10 @@
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{Parser, Subcommand};
+mod common;
+mod folders;
+mod notes;
+
+use folders::{handle_folder_commands, FolderArgs};
+use notes::{add_note, delete_note, edit_note, list_notes, view_note};
 
 /// A fast note-taking CLI
 #[derive(Debug, Parser)]
@@ -45,31 +51,11 @@ enum Commands {
     Folder(FolderArgs),
 }
 
-#[derive(Debug, Subcommand)]
-enum FolderCommands {
-    /// Create a new folder
-    Add {
-        /// Name of the folder
-        #[arg(required = true)]
-        name: String,
-    },
-    /// Delete a folder
-    Delete {
-        /// ID of the folder
-        #[arg(required = true)]
-        id: u32,
-    },
-}
-
-#[derive(Debug, Args)]
-#[command(args_conflicts_with_subcommands = true)]
-#[command(flatten_help = true)]
-struct FolderArgs {
-    #[command(subcommand)]
-    command: Option<FolderCommands>,
-}
 fn main() {
     let args = Cli::parse();
+
+    // Initialize the application
+    common::init::init();
 
     match args.command {
         Some(Commands::Add {
@@ -77,27 +63,23 @@ fn main() {
             content,
             filename,
         }) => {
-            println!("Adding Note with Content {}", content);
-            if let Some(filename) = filename {
-                println!("Saving to {}", filename);
-            }
+            add_note(content, filename, title);
         }
         Some(Commands::View { id }) => {
-            println!("Viewing Note {}", id);
+            view_note(&id);
         }
         Some(Commands::Delete { id }) => {
-            println!("Deleting Note {}", id);
+            delete_note(&id);
         }
-        // Commands::List => todo!(),
         Some(Commands::Edit { id }) => {
-            println!("Editing Note {}", id);
+            edit_note(&id);
         }
-        Some(Commands::Folder(_)) => {
-            println!("Folder commands");
+        Some(Commands::Folder(args)) => {
+            handle_folder_commands(args);
         }
         // Use List if no subcommand was provided
         _ => {
-            println!("Listing Notes");
+            list_notes();
         }
     }
 }
