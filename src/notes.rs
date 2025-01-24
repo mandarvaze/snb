@@ -42,7 +42,7 @@ pub fn list_notes() {
                 .next()
                 .map(|line| line.to_string()) // Convert Option<&str> to Option<String>
                 .unwrap_or_else(|| "".to_string());
-            println!("{} - \"{}\"", filename, first_line);
+            println!("{} - {}", filename, first_line);
         }
     }
 }

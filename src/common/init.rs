@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 
 pub fn get_home_dir() -> PathBuf {
     let default_dir = format!("{}/.snb", home::home_dir().unwrap().to_str().unwrap());
-    let base_dir = env::var("SNB_DIR").unwrap_or_else(|_| default_dir);
-    return Path::new(&base_dir).join("home");
+    let base_dir = env::var("SNB_DIR").unwrap_or(default_dir);
+    Path::new(&base_dir).join("home")
 }
 
 /// Initializes the snb home directory, if it doesn't already exist.
