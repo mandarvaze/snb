@@ -58,15 +58,21 @@ fn main() {
     let args = Cli::parse();
 
     // Initialize the application
-    common::init::init();
+    if let Err(e) = common::init::init() {
+        eprintln!("Failed to initialize: {}", e);
+        std::process::exit(1);
+    }
 
+    // TODO: all commands to return Result
+    // then
+    // let result = match args.command
     match args.command {
         Some(Commands::Add {
             title,
             content,
             filename,
         }) => {
-            add_note(content, filename, title);
+            let _ = add_note(content, filename, title);
         }
         Some(Commands::View { id }) => {
             view_note(&id);
@@ -88,4 +94,13 @@ fn main() {
             list_notes();
         }
     }
+
+    /* TODO: when all commands return Result,
+       uncomment this block
+
+      if let Err(e) = result {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
+    }
+     */
 }

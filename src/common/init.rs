@@ -16,21 +16,25 @@ pub fn get_home_dir() -> PathBuf {
 ///
 /// Inside the home directory, empty `.index` file is created, if it doesn't already exist.
 ///
-pub fn init() {
+pub fn init() -> Result<(), Box<dyn std::error::Error>> {
     let home_dir = get_home_dir();
 
     if !Path::new(&home_dir).exists() {
-        fs::create_dir_all(&home_dir).expect("Failed to create home directory");
+        fs::create_dir_all(&home_dir)?;
         println!("Created directory: {:?}", home_dir);
-    } /* else {
-          println!("Directory already exists: {:?}", home_dir);
-      }*/
+    }
+    /* else {
+        println!("Directory already exists: {:?}", home_dir);
+    }
+    */
 
     let index_file = home_dir.join(".index");
     if !Path::new(&index_file).exists() {
-        fs::File::create(&index_file).expect("Failed to create index file");
+        fs::File::create(&index_file)?;
         println!("Created index file: {:?}", index_file);
-    } /* else {
-          println!(".index file already exists");
-      }*/
+    } else {
+        println!(".index file already exists");
+    }
+
+    Ok(())
 }

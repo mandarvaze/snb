@@ -1,17 +1,26 @@
 use crate::common;
 use std::fs;
-use std::io::Write;
 
-pub fn add_note(content: String, filename: Option<String>, title: Option<String>) {
+pub fn add_note(
+    content: String,
+    filename: Option<String>,
+    title: Option<String>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let home_dir = common::init::get_home_dir();
     let filename = common::utils::get_filename(filename);
     let full_path = home_dir.join(filename);
-    println!("Adding Note with Content {}", content);
-    println!("Saving to {}", full_path.display());
 
-    let mut file = fs::File::create(&full_path).expect("Unable to create file");
-    file.write_all(content.as_bytes())
-        .expect("Unable to write data");
+    // Create content with title if provided
+    let content = if let Some(title) = title {
+        format!("# {}\n\n{}", title, content)
+    } else {
+        content
+    };
+
+    println!("Adding Note to {}", full_path.display());
+
+    fs::write(&full_path, content)?;
+    Ok(())
 }
 
 pub fn view_note(id: &u32) {
