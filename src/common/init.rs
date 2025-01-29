@@ -32,9 +32,9 @@ pub fn init() -> Result<(), Box<dyn std::error::Error>> {
     if !Path::new(&index_file).exists() {
         fs::File::create(&index_file)?;
         println!("Created index file: {:?}", index_file);
-    } else {
-        println!(".index file already exists");
-    }
+    } /* else {
+      println!(".index file already exists");
+      }*/
 
     Ok(())
 }

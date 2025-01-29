@@ -1,4 +1,5 @@
 use crate::common;
+use crate::common::index::{add_filename_to_index, get_index_file_path};
 use std::fs;
 
 pub fn add_note(
@@ -8,7 +9,7 @@ pub fn add_note(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let home_dir = common::init::get_home_dir();
     let filename = common::utils::get_filename(filename);
-    let full_path = home_dir.join(filename);
+    let full_path = home_dir.join(filename.clone()); // Clone filename for index
 
     // Create content with title if provided
     let content = if let Some(title) = title {
@@ -20,6 +21,9 @@ pub fn add_note(
     println!("Adding Note to {}", full_path.display());
 
     fs::write(&full_path, content)?;
+
+    add_filename_to_index(&filename)?;
+
     Ok(())
 }
 
@@ -36,22 +40,20 @@ pub fn edit_note(id: &u32) {
 }
 
 pub fn list_notes() {
-    let home_dir = common::init::get_home_dir();
-    let entries = std::fs::read_dir(home_dir).expect("Unable to read directory");
+    // Read from the .index file
+    let index_file_path = get_index_file_path();
+    let index_content = fs::read_to_string(index_file_path).expect("Unable to read index file");
 
-    for entry in entries {
-        let entry = entry.expect("Unable to get entry");
-        let path = entry.path();
-
-        if path.extension().map(|s| s == "md").unwrap_or(false) {
-            let filename = path.file_name().unwrap().to_string_lossy();
-            let first_line = std::fs::read_to_string(&path)
-                .expect("Unable to read file")
-                .lines()
-                .next()
-                .map(|line| line.to_string()) // Convert Option<&str> to Option<String>
-                .unwrap_or_else(|| "".to_string());
-            println!("{} - {}", filename, first_line);
-        }
+    // Process each line in the index file
+    for (line_number, line) in index_content.lines().enumerate() {
+        let filename = line.trim(); // Assuming each line contains a filename
+        let full_path = common::init::get_home_dir().join(filename);
+        let first_line = std::fs::read_to_string(&full_path)
+            .expect("Unable to read file")
+            .lines()
+            .next()
+            .map(|line| line.to_string()) // Convert Option<&str> to Option<String>
+            .unwrap_or_default();
+        println!("[{}] {} - {}", line_number + 1, filename, first_line);
     }
 }
