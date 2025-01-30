@@ -2,6 +2,7 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use crate::common::log::debug_log;
 use clap_verbosity_flag::VerbosityFilter;
 
 pub fn get_home_dir() -> PathBuf {
@@ -23,21 +24,20 @@ pub fn init(verbosity: VerbosityFilter) -> Result<(), Box<dyn std::error::Error>
 
     if !Path::new(&home_dir).exists() {
         fs::create_dir_all(&home_dir)?;
-        if verbosity == VerbosityFilter::Debug {
-            println!("Created directory: {:?}", home_dir);
-        }
-    } else if verbosity == VerbosityFilter::Debug {
-        println!("Directory already exists: {:?}", home_dir);
+        debug_log(&verbosity, &format!("Created directory: {:?}", home_dir));
+    } else {
+        debug_log(
+            &verbosity,
+            &format!("Directory already exists: {:?}", home_dir),
+        );
     }
 
     let index_file = home_dir.join(".index");
     if !Path::new(&index_file).exists() {
         fs::File::create(&index_file)?;
-        if verbosity == VerbosityFilter::Debug {
-            println!("Created index file: {:?}", index_file);
-        }
-    } else if verbosity == VerbosityFilter::Debug {
-        println!(".index file already exists");
+        debug_log(&verbosity, &format!("Created index file: {:?}", index_file));
+    } else {
+        debug_log(&verbosity, ".index file already exists");
     }
     Ok(())
 }

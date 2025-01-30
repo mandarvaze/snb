@@ -5,6 +5,7 @@ mod common;
 mod folders;
 mod notes;
 
+use crate::common::log::debug_log;
 use bookmarks::{handle_bookmark_commands, BookmarkArgs};
 use folders::{handle_folder_commands, FolderArgs};
 use notes::{add_note, delete_note, edit_note, list_notes, view_note};
@@ -61,7 +62,7 @@ fn main() {
     let args = Cli::parse();
 
     let verbosity = args.verbose.filter();
-
+    debug_log(&verbosity, &format!("Verbosity set to: {}", verbosity));
     // Initialize the application
     if let Err(e) = common::init::init(verbosity) {
         eprintln!("Failed to initialize: {}", e);
