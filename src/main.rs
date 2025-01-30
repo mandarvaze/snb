@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use clap_verbosity_flag::Verbosity;
 mod bookmarks;
 mod common;
 mod folders;
@@ -14,6 +15,8 @@ use notes::{add_note, delete_note, edit_note, list_notes, view_note};
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
+    #[command(flatten)]
+    verbose: Verbosity,
 }
 
 #[derive(Debug, Subcommand)]
@@ -57,8 +60,10 @@ enum Commands {
 fn main() {
     let args = Cli::parse();
 
+    let verbosity = args.verbose.filter();
+
     // Initialize the application
-    if let Err(e) = common::init::init() {
+    if let Err(e) = common::init::init(verbosity) {
         eprintln!("Failed to initialize: {}", e);
         std::process::exit(1);
     }
