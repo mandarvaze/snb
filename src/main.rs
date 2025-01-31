@@ -50,7 +50,7 @@ enum Commands {
     Edit {
         /// id of the note
         #[arg(required = true)]
-        id: u32,
+        id: usize,
     },
     /// Manage folders
     Folder(FolderArgs),
@@ -78,7 +78,7 @@ fn main() {
             content,
             filename,
         }) => {
-            let _ = add_note(content, filename, title);
+            let _ = add_note(content, filename, title, verbosity);
         }
         Some(Commands::View { id }) => {
             view_note(&id);
@@ -87,7 +87,7 @@ fn main() {
             delete_note(&id);
         }
         Some(Commands::Edit { id }) => {
-            edit_note(&id);
+            let _ = edit_note(&id, verbosity);
         }
         Some(Commands::Folder(args)) => {
             handle_folder_commands(args);
