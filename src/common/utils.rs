@@ -1,5 +1,6 @@
 use chrono::Local;
 use std::env;
+use std::fs;
 use std::io;
 use std::process::{Command, Stdio};
 
@@ -13,6 +14,16 @@ pub fn get_filename(filename: Option<String>) -> String {
         let now = get_current_timestamp();
         format!("{}.{}", now, extension)
     })
+}
+
+/// Delete the given file from filesystem
+/// Replace the entry from .index file with empty line
+/// Return an error if the file cannot be removed
+pub fn delete_file(filename: &str) -> io::Result<()> {
+    let full_path = crate::common::init::get_home_dir().join(filename);
+    fs::remove_file(full_path)
+        // Replace the entry from .index file with empty line
+        .and_then(|_| crate::common::index::remove_filename_from_index(filename))
 }
 
 /// Open the given file for editing in editor specified by

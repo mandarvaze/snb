@@ -44,7 +44,7 @@ enum Commands {
     Delete {
         /// id of the note
         #[arg(required = true)]
-        id: u32,
+        id: usize,
     },
     /// Edit a note
     Edit {
@@ -84,7 +84,7 @@ fn main() {
             view_note(&id);
         }
         Some(Commands::Delete { id }) => {
-            delete_note(&id);
+            let _ = delete_note(&id, verbosity);
         }
         Some(Commands::Edit { id }) => {
             let _ = edit_note(&id, verbosity);
