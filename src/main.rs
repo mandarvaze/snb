@@ -95,8 +95,7 @@ fn main() {
         Some(Commands::Bookmark(args)) => {
             handle_bookmark_commands(args);
         }
-        // Use List if no subcommand was provided
-        _ => {
+        _no_subcommand => {
             list_notes();
         }
     }
