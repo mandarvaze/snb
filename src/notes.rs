@@ -1,7 +1,7 @@
 use crate::common;
 use crate::common::index::{add_filename_to_index, get_index_file_path};
 use crate::common::log::debug_log;
-use crate::common::utils::{delete_file, edit_file};
+use crate::common::utils::{delete_file, edit_file, get_title_from_extension};
 use clap_verbosity_flag::VerbosityFilter;
 use std::fs;
 use std::fs::File;
@@ -14,12 +14,16 @@ pub fn add_note(
     verbosity: VerbosityFilter,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let home_dir = common::init::get_home_dir();
-    let filename = common::utils::get_filename(filename);
-    let full_path = home_dir.join(filename.clone()); // Clone filename for index
+    let file_name = common::utils::get_filename(filename, title.clone());
+    let full_path = home_dir.join(file_name.clone()); // Clone filename for index
 
     // Create content with title if provided
     let content = if let Some(title) = title {
-        format!("# {}\n\n{}", title, content)
+        format!(
+            "{}\n\n{}",
+            get_title_from_extension(&title, &file_name),
+            content
+        )
     } else {
         content
     };
@@ -31,7 +35,7 @@ pub fn add_note(
 
     fs::write(&full_path, content)?;
 
-    add_filename_to_index(&filename)?;
+    add_filename_to_index(&file_name)?;
 
     Ok(())
 }

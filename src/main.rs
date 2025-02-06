@@ -32,6 +32,7 @@ enum Commands {
         #[arg(short, long)]
         title: Option<String>,
         /// Optional File to save the note. Defaults to <timestamp>.md
+        #[arg(short, long)]
         filename: Option<String>,
     },
     /// View a note
