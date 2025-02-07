@@ -1,7 +1,13 @@
 [package]
 name = "snb"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+authors = ["Mandar Vaze"]
+description = "Plain text notes from the terminal. A Rust port of nb."
+license = "MIT"
+repository = "https://codeberg.org/mandarvaze/snb"
+keywords = ["cli", "tool", "rust", "notes"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.5.23", features = ["derive"] }
