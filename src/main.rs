@@ -24,6 +24,7 @@ struct Cli {
 enum Commands {
     /// Add a new note
     #[command(arg_required_else_help = true)]
+    #[clap(name = "add", visible_alias = "new", visible_alias = "create")]
     Add {
         /// Content of the note
         #[arg(required = true)]
