@@ -73,6 +73,22 @@ pub fn get_title_from_extension(title: &str, file_path: &str) -> String {
     }
 }
 
+pub fn get_simple_title(content: &str, file_path: &str) -> String {
+    // Get first line, defaulting to empty string if no lines
+    let first_line = content.lines().next().unwrap_or("").trim();
+
+    // Extract the file extension
+    let extension = file_path.split('.').last().unwrap_or("");
+
+    // Strip markup based on file extension
+    match extension {
+        "md" => first_line.trim_start_matches("# ").to_string(),
+        "org" => first_line.trim_start_matches("* ").to_string(),
+        "adoc" => first_line.trim_start_matches("= ").to_string(),
+        _any_other_extension => first_line.to_string(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -117,6 +133,42 @@ mod tests {
         let result = get_filename(filename, title);
         println!("result: {}", result);
         assert!(result.ends_with(".txt")); // use extension from filename
-        assert_eq!(result.len(), 8); // test.org = 8 chars        
+        assert_eq!(result.len(), 8); // test.org = 8 chars
+    }
+
+    #[test]
+    fn test_get_simple_title() {
+        // Test markdown
+        assert_eq!(
+            get_simple_title("# Hello World\nContent", "test.md"),
+            "Hello World"
+        );
+
+        // Test org mode
+        assert_eq!(
+            get_simple_title("* Hello World\nContent", "test.org"),
+            "Hello World"
+        );
+
+        // Test asciidoc
+        assert_eq!(
+            get_simple_title("= Hello World\nContent", "test.adoc"),
+            "Hello World"
+        );
+
+        // Test unknown extension
+        assert_eq!(
+            get_simple_title("Hello World\nContent", "test.txt"),
+            "Hello World"
+        );
+
+        // Test empty content
+        assert_eq!(get_simple_title("", "test.md"), "");
+
+        // Test content without markup
+        assert_eq!(
+            get_simple_title("Hello World\nContent", "test.md"),
+            "Hello World"
+        );
     }
 }

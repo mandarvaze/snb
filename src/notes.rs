@@ -1,7 +1,7 @@
 use crate::common;
 use crate::common::index::{add_filename_to_index, get_index_file_path};
 use crate::common::log::debug_log;
-use crate::common::utils::{delete_file, edit_file, get_title_from_extension};
+use crate::common::utils::{delete_file, edit_file, get_simple_title, get_title_from_extension};
 use clap_verbosity_flag::VerbosityFilter;
 use std::fs;
 use std::fs::File;
@@ -98,6 +98,7 @@ pub fn list_notes() {
             .next()
             .map(|line| line.to_string()) // Convert Option<&str> to Option<String>
             .unwrap_or_default();
-        println!("[{}] {} - {}", line_number + 1, filename, first_line);
+        let title = get_simple_title(&first_line, filename);
+        println!("[{:3}] {} - {}", line_number + 1, filename, title);
     }
 }
