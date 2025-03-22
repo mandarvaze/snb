@@ -1,7 +1,9 @@
 use chrono::Local;
 use std::env;
 use std::fs;
+use std::fs::File;
 use std::io;
+use std::io::BufRead;
 use std::process::{Command, Stdio};
 
 pub fn get_current_timestamp() -> String {
@@ -60,6 +62,33 @@ pub fn edit_file(filename: &str) -> io::Result<()> {
     Ok(())
 }
 
+
+/// Open the given file for viewing in pager specified by
+/// PAGER environment variable
+/// if not set, "less" is used
+/// Returns an error if the file cannot be opened or read.
+pub fn show_file(filename: &str) -> io::Result<()> {
+    let full_path = crate::common::init::get_home_dir().join(filename);
+
+    let pager = env::var("PAGER").unwrap_or_else(|_| "less".to_string());
+    let mut cmd = Command::new(pager.clone());
+    cmd.arg(full_path.to_str().unwrap());
+    cmd.stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit());
+
+    // Execute the command and wait for it to finish.
+    let status = cmd.status()?;
+    if !status.success() {
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            format!("Failed to run pager: {}", pager),
+        ));
+    }
+
+    Ok(())
+}
+
 pub fn get_title_from_extension(title: &str, file_path: &str) -> String {
     // Extract the file extension
     let extension = file_path.split('.').last().unwrap_or("");
@@ -87,6 +116,20 @@ pub fn get_simple_title(content: &str, file_path: &str) -> String {
         "adoc" => first_line.trim_start_matches("= ").to_string(),
         _any_other_extension => first_line.to_string(),
     }
+}
+
+pub fn get_filename_from_index(id: &usize) -> Result<String, Box<dyn std::error::Error>> {
+    let index_file_path = crate::common::index::get_index_file_path();
+    let file = File::open(index_file_path)?;
+    let reader = io::BufReader::new(file);
+
+    // Get the nth line (filename) from the index file
+    let filename = reader
+        .lines()
+        .nth(*id - 1)
+        .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Filename not found"))??;
+
+    Ok(filename)
 }
 
 #[cfg(test)]

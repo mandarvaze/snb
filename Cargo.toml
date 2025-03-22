@@ -1,6 +1,6 @@
 [package]
 name = "snb"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Mandar Vaze"]
 description = "Plain text notes from the terminal. A Rust port of nb."

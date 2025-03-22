@@ -1,11 +1,9 @@
 use crate::common;
 use crate::common::index::{add_filename_to_index, get_index_file_path};
 use crate::common::log::debug_log;
-use crate::common::utils::{delete_file, edit_file, get_simple_title, get_title_from_extension};
+use crate::common::utils::{delete_file, edit_file, show_file, get_simple_title, get_title_from_extension, get_filename_from_index};
 use clap_verbosity_flag::VerbosityFilter;
 use std::fs;
-use std::fs::File;
-use std::io::{self, BufRead};
 
 pub fn add_note(
     content: String,
@@ -40,8 +38,13 @@ pub fn add_note(
     Ok(())
 }
 
-pub fn view_note(id: &u32) {
-    println!("Viewing Note {}", id);
+pub fn view_note(id: &usize, verbosity: VerbosityFilter) -> Result<(), Box<dyn std::error::Error>> {
+    debug_log(&verbosity, &format!("Viewing Note {}", id));
+
+    let filename = get_filename_from_index(id)?;
+    show_file(&filename)?;
+
+    Ok(())
 }
 
 pub fn delete_note(
@@ -52,20 +55,6 @@ pub fn delete_note(
     debug_log(&verbosity, &format!("Deleting Note {}", &filename));
     delete_file(&filename)?;
     Ok(())
-}
-
-fn get_filename_from_index(id: &usize) -> Result<String, Box<dyn std::error::Error>> {
-    let index_file_path = crate::common::index::get_index_file_path();
-    let file = File::open(index_file_path)?;
-    let reader = io::BufReader::new(file);
-
-    // Get the nth line (filename) from the index file
-    let filename = reader
-        .lines()
-        .nth(*id - 1)
-        .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Filename not found"))??;
-
-    Ok(filename)
 }
 
 pub fn edit_note(id: &usize, verbosity: VerbosityFilter) -> Result<(), Box<dyn std::error::Error>> {

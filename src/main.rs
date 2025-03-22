@@ -40,7 +40,7 @@ enum Commands {
     View {
         /// id of the note
         #[arg(required = true)]
-        id: u32,
+        id: usize,
     },
     /// Delete a note
     Delete {
@@ -83,7 +83,7 @@ fn main() {
             let _ = add_note(content, filename, title, verbosity);
         }
         Some(Commands::View { id }) => {
-            view_note(&id);
+            let _ = view_note(&id, verbosity);
         }
         Some(Commands::Delete { id }) => {
             let _ = delete_note(&id, verbosity);
