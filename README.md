@@ -1,7 +1,6 @@
 # snb
 
 [![Crates.io](https://img.shields.io/crates/v/snb)](https://crates.io/crates/snb)
-[![Documentation](https://docs.rs/snb/badge.svg)](https://docs.rs/snb)
 
 Superfast, minimalist note-taking from your terminal [^1]
 
